@@ -30,7 +30,31 @@ const getPassageDetails = async (verseRef, translation, categoryId) => {
 
     // call database function to save passage.text
     // call database function to save passage.categoryId
+  
+    let dbResponse = await postToSql(passage)
+    console.log(dbResponse)
 
+
+  }
+
+  const postToSql = (passage) => {
+
+    return new Promise((resolve, reject) => {
+      //you'll have to make a db object before this
+
+      var sql = `INSERT INTO passages (passage_text,passage_loc,category_id) VALUES (${passage.text},${passage.location},${passage.categoryId})`
+      var values = [passage.text, passage.location, passage.categoryId]
+      
+      connection.query(sql, values, function (err, result) {
+        if(err) {
+          reject("Error posting to databse => " + err)
+        }
+
+        resolve(result)
+  
+      })
+
+    })
 
   }
 
