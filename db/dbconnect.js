@@ -10,18 +10,13 @@ const db = mysql.createConnection({
   })
   
 
-
-// Connect
+  // Connect
 db.connect(function(err) {
   if(err) throw err;
   console.log('Connection Established')
 
   })
 
-
-
-//connection.end(); 
-//console.log('Connection closed');
 
 // Export connection as Middleware
 module.exports = db
