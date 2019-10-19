@@ -1,72 +1,74 @@
 const request = require('request')
-const fetch = require("node-fetch");
 const db = require('./../db/dbconnect')
 
-passage = {
-    "location": undefined,
-    "text": undefined,
-    "categoryId": undefined
-}
 
-//'http://bible-api.com/john 3:16?translation=kjv'
+const getPassageDetails = (verseRef, translation, categoryId, callback) => {
 
-const getPassageDetails = async (verseRef, translation, categoryId) => {
+  // build url dynamically based on args passed
+  url = 'http://bible-api.com/' + verseRef + '?' + 'translation=' + translation
 
-    url = 'http://bible-api.com/' + verseRef + '?' + 'translation=' + translation
+  // make the request
+  request({url, json: true}, (error, response, body) => { 
 
-    try {
-      const response = await fetch(url);
-      const json = await response.json();
+    passage = {
+      "location": undefined,
+      "text": undefined,
+      "categoryId": undefined
+    }
 
-      passage.location = json.reference
-      passage.text = json.verses[0].text
+    // error checking   
+    if(error) {   
+      callback("Unable to connect to Bible service!", undefined)
+      }
+      
+      // update the passage object with values from the response
+      passage.location = body.reference
+      passage.text = body.verses[0].text
       passage.categoryId = categoryId
 
-      //console.log(json);
-      console.log(passage)
-      console.log(passage.text)
-
-     let sql = `INSERT INTO passages (passage_text,passage_loc,category_id) VALUES (${passage.text},${passage.location},${passage.categoryId})`
-     db.query(sql, (error, result) => {
-        if(err) {
-          throw err
-        }
-        console.log(result.affectedRows)
-        // let dbResponse = await postToSql(passage)
-        // console.log(dbResponse)
+      // pass the newly updated passage object back to the function caller
+      callback(passage)
 
      })
 
-    } catch(error) {
-        console.log(error)
+}
 
-    }
+const postToSql = (passage) => {
+
+  return new Promise((resolve, reject) => {
+      //you'll have to make a db object before this
+
+      // build SQL Query
+      let sql = "INSERT INTO `passages` (`passage_text`,`passage_loc`,`category_id`) VALUES ('"+passage.text+"','"+passage.location+"','"+passage.categoryId+"')"
+      //var values = [passage.text, passage.location, passage.categoryId]
+      
+      db.query(sql, function (err, result) {
+
+        // error handling
+        if(err) {
+
+          reject("Error posting to databse => " + err)
+        }
+
+        resolve(result)
+
+        // success validation
+        console.log("Insert Row : " + result.insertId)
+        console.log("Number of rows affected : " + result.affectedRows)
+        console.log("Number of records affected with warning : " + result.warningCount)
+
+        // close the connection
+        db.end()
+  
+      })
+
+    })
 
   }
 
-  // const postToSql = (passage) => {
-
-  //   return new Promise((resolve, reject) => {
-  //     //you'll have to make a db object before this
-
-  //     var sql = `INSERT INTO passages (passage_text,passage_loc,category_id) VALUES (${passage.text},${passage.location},${passage.categoryId})`
-  //     var values = [passage.text, passage.location, passage.categoryId]
-      
-  //     connection.query(sql, values, function (err, result) {
-  //       if(err) {
-  //         reject("Error posting to databse => " + err)
-  //       }
-
-  //       resolve(result)
-  
-  //     })
-
-  //   })
-
-  // }
-
-getPassageDetails('john 3:16', 'kjv', 1)
 
 
-
-
+getPassageDetails('john 3:24', 'kjv', 1, (passage) => {
+  //console.log(passage)
+  postToSql(passage)
+})
