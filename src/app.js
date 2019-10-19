@@ -36,7 +36,6 @@ const getPassageDetails = (verseRef, translation, categoryId, callback) => {
 const postToSql = (passage) => {
 
   return new Promise((resolve, reject) => {
-      //you'll have to make a db object before this
 
       // build SQL Query
       let sql = "INSERT INTO `passages` (`passage_text`,`passage_loc`,`category_id`) VALUES ('"+passage.text+"','"+passage.location+"','"+passage.categoryId+"')"
@@ -59,6 +58,7 @@ const postToSql = (passage) => {
 
         // close the connection
         db.end()
+        console.log('Connection Closed')
   
       })
 
@@ -67,7 +67,7 @@ const postToSql = (passage) => {
   }
 
 
-
+// pass the object I calledback as an argument into an async function to save to database
 getPassageDetails('john 3:24', 'kjv', 1, async (passage) => {
   //console.log(passage)
   await postToSql(passage)
