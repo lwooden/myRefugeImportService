@@ -6,7 +6,7 @@ const db = mysql.createConnection({
     host     : 'myrefuge.cwqssovwkip1.us-east-1.rds.amazonaws.com',
     user     : 'root',
     password : 'password1',
-    database : 'myRefugeDb'
+    database : 'myRefuge'
   })
   
 
