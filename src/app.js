@@ -68,7 +68,7 @@ const postToSql = (passage) => {
 
 
 
-getPassageDetails('john 3:24', 'kjv', 1, (passage) => {
+getPassageDetails('john 3:24', 'kjv', 1, async (passage) => {
   //console.log(passage)
-  postToSql(passage)
+  await postToSql(passage)
 })
