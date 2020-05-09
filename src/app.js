@@ -6,12 +6,6 @@ const getPassageDetails = (verseRef, translation, categoryId, callback) => {
 
   request({url, json: true}, (error, response, body) => { 
 
-    // passage = {
-    //   "location": undefined,
-    //   "text": undefined,
-    //   "categoryId": undefined
-    // }
-
     passage = {
       "passageLocation": undefined,
       "passageText": undefined,
